@@ -1,0 +1,75 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: nodehealthchecks.andrewthetechie.github.com
+spec:
+  scope: Namespaced
+  group: andrewthetechie.github.com
+  names:
+    kind: NodeHealthCheck
+    plural: nodehealthchecks
+    singular: nodehealthcheck
+    shortNames:
+      - nhc
+      - nhcs
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+              properties:
+                timeout:
+                  type: integer
+                  minimum: 180
+                  default: 1800
+                  maximum: 2592000
+                  description: A number of seconds, the expected period of this check.
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of tags describing this check
+                description:
+                  type: string
+                  default: ""
+                  description: Description of this check
+                grace_period:
+                  type: integer
+                  minimum: 0
+                  maximum: 2592000
+                  default: 3600
+                  description: A number of seconds, the grace period for this check.
+                channels:
+                  type: array
+                  items:
+                    type: string
+                  default:
+                    - "*"
+                  description: List of notification channels to send to. Default is "*" or all channels
+                node:
+                  type: string
+                  description: Name of k8s node this check is for
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            healthcheck_id:
+              type: string
+              description: uuid of this check in healthchecks
+            ping_url:
+              type: string
+              description: The url to curl to ping this check
+      additionalPrinterColumns:
+        - name: Node
+          type: string
+          description: The node this check is for
+          jsonPath: .spec.node
+        - name: UUID
+          type: string
+          description: The UUID of this check
+          jsonPath: .healthcheck_id

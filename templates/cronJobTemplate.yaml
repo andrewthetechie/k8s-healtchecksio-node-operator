@@ -1,0 +1,17 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: ""
+  namespace: ""
+spec:
+  schedule: ""
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeName: ""
+          containers:
+          - name: ""
+            image: ""
+            args: ['-fsS', '-m 10']
+          restartPolicy: Never
