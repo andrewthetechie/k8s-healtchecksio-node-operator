@@ -64,6 +64,12 @@ spec:
             ping_url:
               type: string
               description: The url to curl to ping this check
+            cronjob_name:
+              type: string
+              description: The name of the cronjob to ping this check
+            cronjob_uid:
+              type: string
+              description: uid of the cronjob to ping this check
       additionalPrinterColumns:
         - name: Node
           type: string

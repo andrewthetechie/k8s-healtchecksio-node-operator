@@ -189,17 +189,24 @@ def patch_object(name: str, namespace: str, patch_data: Dict, logger) -> bool:
 def _get_cronjob_schedule(timeout: int) -> str:
     """Turns a timeout (seconds int) into a cron style schedule to try to ping N times in that timeout"""
     ping_interval = timeout / CONFIG.pings_per_interval
+    print(f"Ping interval: {ping_interval}")
+
     ping_interval_days = int(ping_interval // (60 * 60 * 24))
+    print(f"Ping interval days: {ping_interval_days}")
     if ping_interval_days > 0:
-        return f"0 0 */{ ping_interval_days } * *"
+        return f"0 0 */{ int(ping_interval_days) } * *"
+
     ping_interval_hours = int(ping_interval // (60 * 60))
+    print(f"Ping interval hours: {ping_interval_hours}")
     if ping_interval_hours > 0:
-        return f"0 {ping_interval_hours} * * * "
+        return f"0 */{ int(ping_interval_hours) } * * * "
+
     ping_interval_minutes = ping_interval // 60
+    print(f"Ping interval minutes: {ping_interval_minutes}")
     if ping_interval_minutes > 0:
         if ping_interval_minutes > 30:
             return "*/30 * * * *"
-        return f"*/{ ping_interval_minutes } * * * *"
+        return f"*/{ int(ping_interval_minutes) } * * * *"
     # default to pinging every 2 minutes
     return "*/2 * * * *"
 
@@ -278,8 +285,8 @@ def _create_nhc(name: str, namespace: str, logger, spec: Dict) -> str:
         {
             "healthcheck_id": alert["ping_url"].split("/")[-1],
             "ping_url": ping_url,
-            "cronjob_uuid": cronjob["metadata"]["uuid"],
-            "cronjob_name": cronjob["metadata"]["name"],
+            "cronjob_uid": cronjob.metadata.uid,
+            "cronjob_name": cronjob.metadata.name,
         },
         logger=logger,
     )
@@ -308,8 +315,8 @@ def _update_nhc(body, spec, name, namespace, logger) -> str:
         {
             "healthcheck_id": alert["ping_url"].split("/")[-1],
             "ping_url": ping_url,
-            "cronjob_uuid": cronjob["metadata"]["uuid"],
-            "cronjob_name": cronjob["metadata"]["name"],
+            "cronjob_uid": cronjob.metadata.uid,
+            "cronjob_name": cronjob.metadata.name,
         },
         logger=logger,
     )
